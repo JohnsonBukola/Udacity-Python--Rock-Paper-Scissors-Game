@@ -1,16 +1,12 @@
 import random
-import time
 
-#Codes to play the game of Rock, Paper, Scissors between a Human player and the Computer. It reports both Player's scores after each round."""
+# Codes to play the game of Rock, Paper, Scissors between a Human player
+# and the Computer. It reports both Player's scores after each round.
 
 moves = ['rock', 'paper', 'scissors']
 
-#The Player class is the parent class for all of the Players in this game
 
-def print_pause(message_to_print):
-    print(message_to_print)
-    time.sleep(1)
-    
+# The Player class is the parent class for all of the Players in this game
 class Player:
     def __init__(self):
         self.count = 0
@@ -22,12 +18,18 @@ class Player:
         pass
 
 
-class ComputerPlayer(Player):
+class RandomPlayer(Player):
     def __init__(self):
         self.count = 0
 
     def move(self):
         return random.choice(moves)
+
+
+class RepeatPlayer(Player):
+    def move(self):
+        #  Always plays rock
+        return 'rock'
 
 
 class HumanPlayer(Player):
@@ -37,7 +39,8 @@ class HumanPlayer(Player):
     def move(self):
         Human_choice = input("rock, paper or scissors?")
         while Human_choice.lower() not in moves:
-            Human_choice = input("invalid response, 'rock', 'paper' or 'scissors'?")
+            Human_choice = input(
+                "invalid response, 'rock', 'paper' or 'scissors'?")
         return Human_choice.lower()
 
 
@@ -71,9 +74,7 @@ class CyclePlayer(Player):
         return self.cycle
 
 
-#wins fucntion used to determine who beats who
-
-
+# wins fucntion used to determine who beats who
 def wins(one, two):
     return ((one == 'rock' and two == 'scissors') or
             (one == 'scissors' and two == 'paper') or
@@ -84,6 +85,12 @@ class Game:
     def __init__(self, p1, p2):
         self.p1 = p1
         self.p2 = p2
+
+    def results(self):
+        if self.p1.count > self.p2.count:
+            print("\n\n*** PLAYER ONE WINS THE GAME!! *** ")
+        elif self.p2.count > self.p1.count:
+            print("\n\n*** PLAYER TWO WINS THE GAME!! *** ")
 
     def play_round(self):
         move1 = self.p1.move()
@@ -97,55 +104,28 @@ class Game:
         else:
             print("player2 wins this round")
             self.p2.count += 1
-        print(f"Score board Player1: {self.p1.count} vs Player2: {self.p2.count}")
+        print(
+            f"Score line Player1: {self.p1.count} vs Player2: {self.p2.count}")
         self.p1.learn(move1, move2)
         self.p2.learn(move2, move1)
-        
 
     def play_game(self):
-        rounds = input("Type number of rounds to play")
-        while "." in rounds or float(rounds) <= 0:
-            rounds = input("Enter a valid NUMBER like 1,2...")
-
-        print(f"Game start! You have {rounds} rounds, let's go!")
-        for round in range(int(rounds)):
-            print(f"Round {round}:")
+        print("*** Game start! ***")
+        for round in range(3):
+            print(f"\n\nRound {round}:")
             self.play_round()
-        if self.p1.count > self.p2.count:
-            print("***Final score: Player1 won!***")
-        elif self.p1.count == self.p2.count:
-            print("***Final score: Tie!***")
-        elif self.p1.count < self.p2.count:
-            print("***Final result: Player2 won!***")
-        print("Game over!")
-        play_again()
-        
-def exit_program():
-    print("Exiting the program...")
-    random.exit(0)
+        self.results()
+        # Another loop in case there was a tie in the first three rounds.
+        for round in range(3, 9):
+            if self.p1.count == self.p2.count:
+                print(f"\n\nRound {round}:")
+                self.play_round()
+                self.results()
+        print("Game over!\n\n")
 
-
-decision = ['yes' , 'no']
-
-def play_again():
-    print_pause("Would you like to play again?")
-
-    response = input("please, say 'yes' or 'no'")
-    while response.lower() not in decision:
-        response = input("invalid response, please, say 'yes' or 'no' ")
-    #return response.lower()
-    
-    if decision == "no":
-        print_pause("Thanks for playing! See you next time.")
-        exit_program()
-        
-    else:# response == "yes":
-        print_pause("Excellent. Restarting the game.")
-        game.play_game()
-        
 
 if __name__ == '__main__':
     player_1 = HumanPlayer()
-    player_2 = ComputerPlayer()
+    player_2 = RandomPlayer()
     game = Game(player_1, player_2)
     game.play_game()
